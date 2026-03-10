@@ -17,5 +17,5 @@ app.use('/api/v1/ventas', ventaRoutes);
 
 
 app.listen(PORT, () => {
-  console.log(`Servidor de StackFlow en http://localhost:${PORT}`);
+  console.log(`Servidor de StockFlow en http://localhost:${PORT}`);
 });
