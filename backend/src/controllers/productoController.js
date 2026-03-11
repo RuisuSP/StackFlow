@@ -21,29 +21,18 @@ exports.crearProducto = async (req, res) => {
     const { nombre, descripcion, precio, stock } = req.body;
 
     if (!nombre || precio <= 0 || stock < 0) {
-      return res.status(400).json({
-        status: "error",
-        message: "Datos inválidos. El precio debe ser > 0 y el stock >= 0."
-      });
+      return res.status(400).json({ status: "error", message: "Datos inválidos" });
     }
 
-    // Guardar en BD
-    const nuevoProducto = {
-      nombre,
-      descripcion,
-      precio,
-      stock,
-      fechaCreacion: new Date().toISOString()
-    };
+    const existencia = await db.collection('productos').where('nombre', '==', nombre).get();
+    if (!existencia.empty) {
+      return res.status(400).json({ status: "error", message: "Ese producto ya está registrado" });
+    }
 
+    const nuevoProducto = { nombre, descripcion, precio, stock, fechaCreacion: new Date().toISOString() };
     const docRef = await db.collection('productos').add(nuevoProducto);
 
-    res.status(201).json({
-      status: "success",
-      message: "Producto creado correctamente",
-      data: { id: docRef.id }
-    });
-
+    res.status(201).json({ status: "success", data: { id: docRef.id } });
   } catch (error) {
     res.status(500).json({ status: "error", message: error.message });
   }
