@@ -1,4 +1,5 @@
-const admin = require('firebase-admin');
+// Cambia el require para traer el objeto que configuramos
+const { auth } = require('../config/firebase'); 
 
 const checkAuth = async (req, res, next) => {
   const token = req.headers.authorization?.split('Bearer ')[1];
@@ -8,11 +9,12 @@ const checkAuth = async (req, res, next) => {
   }
 
   try {
-    // Verificacion de token
-    const decodedToken = await admin.auth().verifyIdToken(token);
-    req.user = decodedToken; // Se guardan los datos
+    // Ahora usamos el objeto 'auth' que ya viene inicializado
+    const decodedToken = await auth.verifyIdToken(token);
+    req.user = decodedToken;
     next();
   } catch (error) {
+    console.error("Error validando token:", error.message);
     res.status(401).json({ status: "error", message: "Token inválido o expirado" });
   }
 };
