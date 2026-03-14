@@ -1,4 +1,4 @@
-const db = require('../config/firebase');
+const { db } = require('../config/firebase');
 
 // Obtener todas las ventas (GET)
 exports.obtenerVentas = async (req, res) => {
@@ -17,12 +17,13 @@ exports.obtenerVentas = async (req, res) => {
 
 // Hacer una venta (POST)
 exports.registrarVenta = async (req, res) => {
-    const { usuarioId, productos, total } = req.body; 
-    // productos es una lista: [{id, cantidad, precio}, ...]
+    // Firebase guarda el email en el token decodificado
+    const usuarioEmail = req.user.email; 
+    const { productos, total } = req.body;
 
     try {
         await db.runTransaction(async (t) => {
-            // 1. Verificar stock de cada producto
+            // Verificar stock de cada producto
             for (const item of productos) {
                 const pRef = db.collection('productos').doc(item.id);
                 const doc = await t.get(pRef);
@@ -34,24 +35,20 @@ exports.registrarVenta = async (req, res) => {
                     throw new Error(`Stock insuficiente para ${doc.data().nombre}`);
                 }
 
-                // 2. Restar el stock
+                // Restar el stock
                 t.update(pRef, { stock: stockActual - item.cantidad });
             }
 
-            // 3. Crear el ticket de venta
             const ventaRef = db.collection('ventas').doc();
             t.set(ventaRef, {
-                usuarioId,
+                usuarioEmail, // <-- Aquí se guarda el correo real de quien está logueado
                 productos,
                 total,
                 fecha: new Date().toISOString()
             });
         });
-
-        res.status(201).json({ status: "success", message: "Venta realizada y stock actualizado" });
+        res.status(201).json({ status: "success", message: "Venta realizada exitosamente." });
     } catch (error) {
         res.status(400).json({ status: "error", message: error.message });
     }
 };
-
-
