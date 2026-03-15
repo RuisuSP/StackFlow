@@ -28,7 +28,5 @@ export const eliminarProducto = (id) => api.delete(`/productos/${id}`);
 // ... (lo que ya tenías de productos)
 export const getVentas = () => api.get('/ventas');
 export const crearVenta = (data) => api.post('/ventas', data);
-export const editarVenta = (id, data) => api.put(`/ventas/${id}`, data);
-export const eliminarVenta = (id) => api.delete(`/ventas/${id}`);
 
 export default api;

@@ -92,6 +92,10 @@ function App() {
           {productos.map(p => (
             <div key={p.id} className="product-card">
               <h4>{p.nombre}</h4>
+              {/* ID del producto en gris y chiquito justo debajo del nombre */}
+              <p style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '-10px', marginBottom: '10px' }}>
+                ID: {p.id}
+              </p>
               <p className="description">{p.descripcion}</p>
               <div className="meta">
                 <span className="price">${p.precio}</span>
